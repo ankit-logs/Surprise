@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Little Secret</title>
+    <style>
+        :root {
+            --bg: #050712;
+            --pink: #ff9dcc;
+            --violet: #bba6ff;
+            --soft: #b9b4c9;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: white;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif
+        }
+
+        body {
+            cursor: default
+        }
+
+        #app {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(ellipse at 72% 25%, rgba(105, 92, 210, .12), transparent 35%),
+                radial-gradient(ellipse at 75% 85%, rgba(220, 70, 160, .10), transparent 38%),
+                linear-gradient(145deg, #070918, #03050e 62%, #100712)
+        }
+
+        #sky {
+            position: absolute;
+            inset: 0
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: .5;
+            animation: twinkle 3s ease-in-out infinite
+        }
+
+        @keyframes twinkle {
+            50% {
+                opacity: .12;
+                transform: scale(.6)
+            }
+        }
+
+        .fog {
+            position: absolute;
+            inset: auto -10% 0;
+            height: 40%;
+            background: linear-gradient(transparent, rgba(120, 120, 180, .035));
+            filter: blur(25px);
+            pointer-events: none
+        }
+
+        .moon {
+            position: absolute;
+            right: 8%;
+            top: 8%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #fff, #d8d5ef 65%, #aaa5cb);
+            box-shadow: 0 0 60px rgba(210, 205, 255, .15)
+        }
+
+        .moon:after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            right: -23px;
+            top: -9px;
+            background: #070918
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            transition: opacity 1s ease, transform 1.2s cubic-bezier(.16, 1, .3, 1);
+            z-index: 2
+        }
+
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: scale(1.08)
+        }
+
+        #landing {
+            display: grid;
+            place-items: center
+        }
+
+        .copy {
+            position: absolute;
+            right: 8%;
+            top: 21%;
+            width: min(500px, 82vw);
+            text-align: center;
+            z-index: 5
+        }
+
+        .kicker {
+            font-size: 11px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #a9a0dc
+        }
+
+        h1 {
+            font-size: clamp(42px, 6vw, 78px);
+            line-height: .92;
+            letter-spacing: -5px;
+            margin: 18px 0 0;
+            background: linear-gradient(120deg, #fff, #ffbadf, #c7bbff, #fff);
+            background-size: 250% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 5s linear infinite
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 250% center
+            }
+        }
+
+        .copy p {
+            color: #9f9bac;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 22px 0
+        }
+
+        button {
+            font: inherit;
+            color: #fff
+        }
+
+        #secret {
+            border: 1px solid rgba(255, 255, 255, .17);
+            border-radius: 999px;
+            padding: 16px 30px;
+            background: linear-gradient(110deg, rgba(80, 100, 255, .28), rgba(255, 80, 190, .2));
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 45px rgba(60, 40, 160, .18), inset 0 1px rgba(255, 255, 255, .12);
+            cursor: pointer;
+            transition: .3s;
+            position: relative;
+            overflow: hidden
+        }
+
+        #secret:hover {
+            transform: translateY(-5px) scale(1.04);
+            box-shadow: 0 20px 60px rgba(130, 70, 220, .3)
+        }
+
+        #secret:active {
+            transform: scale(.97)
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #67647a;
+            margin-top: 13px
+        }
+
+        #ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 29%;
+            background: linear-gradient(to bottom, transparent, #050711 35%, #020309);
+            border-top: 1px solid rgba(255, 255, 255, .025)
+        }
+
+        #ground:after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 20%, rgba(120, 110, 170, .07), transparent 45%)
+        }
+
+        #turtleWrap {
+            position: absolute;
+            left: 13%;
+            bottom: 17%;
+            width: 240px;
+            height: 190px;
+            z-index: 4;
+            touch-action: none;
+            user-select: none;
+            cursor: grab;
+            transition: filter .25s
+        }
+
+        #turtleWrap.dragging {
+            cursor: grabbing;
+            filter: drop-shadow(0 20px 35px rgba(0, 0, 0, .55))
+        }
+
+        #turtleCanvas {
+            width: 240px;
+            height: 190px
+        }
+
+        .turtleTag {
+            position: absolute;
+            left: 50%;
+            top: -24px;
+            transform: translateX(-50%);
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #aaa4bd;
+            background: rgba(8, 9, 22, .62);
+            border: 1px solid rgba(255, 255, 255, .08);
+            padding: 7px 11px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: .25s;
+            white-space: nowrap
+        }
+
+        #turtleWrap:hover .turtleTag {
+            opacity: 1
+        }
+
+        .bucket {
+            position: absolute;
+            left: 7%;
+            bottom: 16%;
+            width: 68px;
+            height: 53px;
+            border-radius: 7px 7px 20px 20px;
+            background: linear-gradient(90deg, #24283a, #555b70, #292d40);
+            border: 2px solid #777d94;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, .35)
+        }
+
+        .bucket:before {
+            content: "";
+            position: absolute;
+            left: -8px;
+            top: -22px;
+            width: 76px;
+            height: 25px;
+            border: 4px solid #767d95;
+            border-bottom: 0;
+            border-radius: 50% 50% 0 0
+        }
+
+        .bucket:after {
+            content: "✦";
+            position: absolute;
+            left: 25px;
+            top: 15px;
+            color: #ff9dcc
+        }
+
+        .flower {
+            position: absolute;
+            font-size: 31px;
+            filter: drop-shadow(0 0 12px rgba(255, 120, 190, .2));
+            animation: sway 3s ease-in-out infinite alternate
+        }
+
+        .f1 {
+            left: 9%;
+            bottom: 12%
+        }
+
+        .f2 {
+            left: 28%;
+            bottom: 8%
+        }
+
+        .f3 {
+            right: 12%;
+            bottom: 13%
+        }
+
+        @keyframes sway {
+            to {
+                transform: rotate(7deg) translateY(-4px)
+            }
+        }
+
+        #reveal {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(.88)
+        }
+
+        #reveal.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1)
+        }
+
+        .revealTitle {
+            position: absolute;
+            right: 8%;
+            top: 17%;
+            width: min(580px, 76vw);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(25px);
+            transition: 1s 2.8s
+        }
+
+        #reveal.show .revealTitle {
+            opacity: 1;
+            transform: none
+        }
+
+        .revealTitle .kicker {
+            color: #aaa1e4
+        }
+
+        .revealTitle h2 {
+            font-size: clamp(44px, 6vw, 82px);
+            letter-spacing: -5px;
+            line-height: .95;
+            margin: 18px 0;
+            background: linear-gradient(120deg, #fff, #ffb4db, #c7baff, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .revealTitle p {
+            color: #aaa5b8
+        }
+
+        #revealTurtle {
+            position: absolute;
+            left: -260px;
+            bottom: 18%;
+            width: 280px;
+            height: 220px;
+            z-index: 7
+        }
+
+        #reveal.show #revealTurtle {
+            animation:
+                walkIn 2.7s cubic-bezier(.16, 1, .3, 1) .15s forwards,
+                gentlePause 1.2s ease 2.85s 1;
+        }
+
+        @keyframes gentlePause {
+            0% {
+                transform: translateY(0)
+            }
+
+            35% {
+                transform: translateY(2px) scale(.995)
+            }
+
+            70% {
+                transform: translateY(0) scale(1)
+            }
+
+            100% {
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes walkIn {
+            to {
+                left: 22%
+            }
+        }
+
+        .speech {
+            position: absolute;
+            left: 34%;
+            bottom: 46%;
+            z-index: 8;
+            opacity: 0;
+            transform: translateY(12px) scale(.92);
+            background: rgba(18, 17, 34, .72);
+            border: 1px solid rgba(255, 160, 215, .25);
+            backdrop-filter: blur(18px);
+            padding: 14px 20px;
+            border-radius: 22px 22px 22px 5px;
+            box-shadow: 0 18px 55px rgba(0, 0, 0, .35)
+        }
+
+        #reveal.show .speech {
+            animation: appear .65s ease 2.75s forwards
+        }
+
+        .speech b {
+            display: block;
+            color: #ffb0d9;
+            font-size: 17px;
+            margin-bottom: 3px
+        }
+
+        .speech span {
+            font-size: 12px;
+            color: #aaa5b8
+        }
+
+        @keyframes appear {
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .giveFlower {
+            position: absolute;
+            left: 30%;
+            bottom: 31%;
+            font-size: 54px;
+            z-index: 9;
+            opacity: 0;
+            filter: drop-shadow(0 0 18px rgba(255, 120, 190, .45))
+        }
+
+        #reveal.show .giveFlower {
+            animation: handoff 1.5s cubic-bezier(.16, 1, .3, 1) 3.25s forwards
+        }
+
+        @keyframes handoff {
+            0% {
+                opacity: 0;
+                transform: translate(-25px, 25px) rotate(-25deg) scale(.35)
+            }
+
+            20% {
+                opacity: 1
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(135px, -5px) rotate(8deg) scale(1)
+            }
+        }
+
+        .card {
+            position: absolute;
+            right: 7%;
+            top: 48%;
+            width: min(550px, 70vw);
+            padding: 28px;
+            border-radius: 25px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, .065), rgba(255, 255, 255, .018));
+            border: 1px solid rgba(255, 155, 215, .2);
+            backdrop-filter: blur(22px);
+            box-shadow: 0 35px 100px rgba(0, 0, 0, .42);
+            opacity: 0;
+            transform: translateY(28px)
+        }
+
+        #reveal.show .card {
+            animation: cardIn 1s cubic-bezier(.16, 1, .3, 1) 4s forwards
+        }
+
+        @keyframes cardIn {
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .card h3 {
+            color: #ffb0d9;
+            margin: 0 0 12px;
+            font-size: 21px
+        }
+
+        .card p {
+            color: #b8b3c4;
+            line-height: 1.85;
+            font-size: 14px;
+            margin: 0
+        }
+
+        .back {
+            margin-top: 18px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            background: rgba(255, 255, 255, .035);
+            padding: 10px 20px;
+            border-radius: 999px;
+            cursor: pointer;
+            color: #9f9aaa;
+            transition: .25s
+        }
+
+        .back:hover {
+            color: #fff;
+            transform: translateY(-3px)
+        }
+
+        .petals {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10
+        }
+
+        .petal {
+            position: absolute;
+            font-size: 16px;
+            animation: petal 2.6s ease-out forwards
+        }
+
+        @keyframes petal {
+            from {
+                opacity: 0;
+                transform: translate(0, 0) rotate(0)
+            }
+
+            20% {
+                opacity: .9
+            }
+
+            to {
+                opacity: 0;
+                transform: translate(var(--x), var(--y)) rotate(180deg)
+            }
+        }
+
+
+        /* --- More human / realistic apology treatment --- */
+        .speech {
+            min-width: 245px;
+            max-width: 300px;
+            padding: 17px 20px 16px;
+            transform-origin: 0 100%;
+        }
+
+        .speech:after {
+            content: "";
+            position: absolute;
+            left: 18px;
+            bottom: -8px;
+            width: 16px;
+            height: 16px;
+            background: rgba(18, 17, 34, .72);
+            border-right: 1px solid rgba(255, 160, 215, .25);
+            border-bottom: 1px solid rgba(255, 160, 215, .25);
+            transform: rotate(45deg);
+        }
+
+        .speech b {
+            letter-spacing: .1px;
+            font-weight: 650;
+            transition: opacity .35s ease, transform .35s ease;
+        }
+
+        .speech span {
+            display: block;
+            margin-top: 4px;
+            transition: opacity .35s ease;
+        }
+
+        .speech.fade-line b,
+        .speech.fade-line span {
+            opacity: 0;
+            transform: translateY(4px)
+        }
+
+        .apology-label {
+            color: #8e88a7;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 9px;
+            margin-bottom: 9px;
+        }
+
+        .card h3 {
+            font-weight: 650;
+        }
+
+        .card em {
+            color: #e3ddeb;
+            font-style: normal;
+        }
+
+        #reveal.show .card {
+            box-shadow:
+                0 35px 100px rgba(0, 0, 0, .42),
+                0 0 45px rgba(255, 120, 190, .07);
+        }
+
+        #reveal.show .giveFlower {
+            filter: drop-shadow(0 0 8px rgba(255, 140, 195, .35)) drop-shadow(0 0 24px rgba(255, 140, 195, .22));
+        }
+
+        @media(max-width:800px) {
+            .moon {
+                width: 65px;
+                height: 65px;
+                right: 7%;
+                top: 7%
+            }
+
+            .copy {
+                top: 8%;
+                right: 50%;
+                transform: translateX(50%);
+                width: 90%
+            }
+
+            .copy h1 {
+                font-size: 44px
+            }
+
+            .copy p {
+                font-size: 12px
+            }
+
+            #turtleWrap {
+                left: 50%;
+                bottom: 10%;
+                transform: translateX(-50%) scale(.8)
+            }
+
+            .bucket {
+                left: 9%;
+                bottom: 9%;
+                transform: scale(.75)
+            }
+
+            .revealTitle {
+                top: 8%;
+                right: 5%;
+                width: 90%
+            }
+
+            .revealTitle h2 {
+                font-size: 47px
+            }
+
+            #revealTurtle {
+                bottom: 8%;
+                width: 240px;
+                height: 190px
+            }
+
+            #reveal.show #revealTurtle {
+                animation: walkMobile 2.4s cubic-bezier(.16, 1, .3, 1) .15s forwards
+            }
+
+            @keyframes walkMobile {
+                to {
+                    left: 8%
+                }
+            }
+
+            .speech {
+                left: 8%;
+                bottom: 39%
+            }
+
+            .giveFlower {
+                left: 17%;
+                bottom: 23%
+            }
+
+            .card {
+                left: 5%;
+                right: 5%;
+                top: auto;
+                bottom: 5%;
+                width: 90%;
+                padding: 20px
+            }
+
+            .card p {
+                font-size: 12px;
+                line-height: 1.6
+            }
+
+            .card h3 {
+                font-size: 18px
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+
+            *,
+            *:before,
+            *:after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sky"></div>
+        <div class="moon"></div>
+        <div class="fog"></div>
+
+        <section id="landing" class="screen">
+            <div id="ground"></div>
+            <div class="flower f1">🌷</div>
+            <div class="flower f2">🌼</div>
+            <div class="flower f3">🌸</div>
+            <div class="bucket"></div>
+
+            <div id="turtleWrap">
+                <canvas id="turtleCanvas" width="480" height="380"></canvas>
+                <div class="turtleTag">drag me 🐢</div>
+            </div>
+
+            <div class="copy">
+                <div class="kicker">just a little secret</div>
+                <h1>Something<br>is waiting.</h1>
+                <p>Our little friend is cleaning up.<br>Nothing suspicious here. 🐢</p>
+                <button id="secret">Don't Click This →</button>
+                <div class="hint">You can drag the turtle around.</div>
+            </div>
+        </section>
+
+        <section id="reveal" class="screen">
+            <div id="revealTurtle">
+                <canvas id="revealCanvas" width="560" height="440"></canvas>
+            </div>
+            <div class="speech" id="sorrySpeech">
+                <b id="sorryLine">I'm sorry...</b>
+                <span id="sorrySubline">I know I messed up.</span>
+            </div>
+            <div class="giveFlower">🌸</div>
+
+            <div class="revealTitle">
+                <div class="kicker">a little secret</div>
+                <h2>You Found It 👀</h2>
+                <p>He came all this way just to say sorry.</p>
+            </div>
+
+            <div class="card">
+                <div class="apology-label">a little honesty</div>
+                <h3>I really am sorry. ♡</h3>
+                <p id="apologyText">
+                    I don't have a perfect excuse. I just wanted a way to say
+                    something I probably should have said sooner.
+                    <br><br>
+                    So this little guy brought you a flower because sometimes
+                    a simple <em>“I'm sorry”</em> means more than a long explanation.
+                    <br><br>
+                    <strong>Please keep the flower. 🌸</strong>
+                    <br><br>
+                    And if you can... forgive me. 🐢
+                </p>
+                <button class="back" id="back">← Go Back</button>
+            </div>
+            <div class="petals" id="petals"></div>
+        </section>
+    </div>
+
+    <script>
+        /* Stars */
+        const sky = document.getElementById('sky');
+        for (let i = 0; i < 95; i++) {
+            const s = document.createElement('i'); s.className = 'star';
+            s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+            s.style.animationDelay = (-Math.random() * 4) + 's'; s.style.animationDuration = (2 + Math.random() * 4) + 's';
+            sky.appendChild(s);
+        }
+
+        /* A more natural turtle renderer: layered gradients, shell plates, soft shading,
+           blinking, breathing and alternating foot motion. */
+        function makeTurtle(canvas, reveal = false) {
+            const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
+            let t = 0, blink = 0;
+            function draw() {
+                t += .035; blink += .035; c.clearRect(0, 0, W, H);
+                const S = reveal ? 1.18 : 1.0, cx = W * .48, cy = H * .54 + Math.sin(t * 1.3) * 3;
+                c.save(); c.translate(cx, cy); c.scale(S, S);
+                c.globalAlpha = .22; c.filter = 'blur(10px)';
+                c.fillStyle = '#000'; c.beginPath(); c.ellipse(0, 58, 92, 20, 0, 0, Math.PI * 2); c.fill();
+                c.filter = 'none'; c.globalAlpha = 1;
+
+                /* legs, alternating */
+                const walk = Math.sin(t * 5.5);
+                const legs = [[-57, 38, -walk * 7], [-12, 58, walk * 7], [48, 35, walk * 7], [74, 2, -walk * 7]];
+                for (const [x, y, a] of legs) {
+                    c.save(); c.translate(x, y); c.rotate(a * Math.PI / 180);
+                    const lg = c.createRadialGradient(-4, -5, 2, 0, 4, 22); lg.addColorStop(0, '#83d77c'); lg.addColorStop(.7, '#4e9e5b'); lg.addColorStop(1, '#285b3a');
+                    c.fillStyle = lg; c.strokeStyle = '#234c32'; c.lineWidth = 3; c.beginPath(); c.ellipse(0, 0, 24, 15, 0, 0, Math.PI * 2); c.fill(); c.stroke(); c.restore();
+                }
+
+                /* body */
+                const body = c.createRadialGradient(-30, -35, 5, 0, 0, 80);
+                body.addColorStop(0, '#9be47f'); body.addColorStop(.55, '#58ad61'); body.addColorStop(1, '#285d3d');
+                c.fillStyle = body; c.strokeStyle = '#214b31'; c.lineWidth = 4;
+                c.beginPath(); c.ellipse(-3, 14, 75, 57, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+
+                /* shell */
+                const sh = c.createRadialGradient(-27, -30, 5, 0, 0, 76);
+                sh.addColorStop(0, '#c49352'); sh.addColorStop(.45, '#8a6034'); sh.addColorStop(1, '#3f2a1c');
+                c.fillStyle = sh; c.strokeStyle = '#302016'; c.lineWidth = 5;
+                c.beginPath(); c.ellipse(-7, 0, 70, 72, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+                c.strokeStyle = 'rgba(255,210,125,.28)'; c.lineWidth = 2;
+                for (let r = 0; r < 3; r++) { c.beginPath(); c.ellipse(-7, 0, 55 - r * 16, 58 - r * 17, 0, 0, Math.PI * 2); c.stroke() }
+                c.beginPath(); c.moveTo(-62, 0); c.quadraticCurveTo(-7, -18, 48, 0); c.stroke();
+                c.beginPath(); c.moveTo(-62, 12); c.quadraticCurveTo(-7, 35, 48, 12); c.stroke();
+
+                /* head */
+                const hd = c.createRadialGradient(2, -18, 4, 8, 0, 45);
+                hd.addColorStop(0, '#a6e987'); hd.addColorStop(.6, '#65bd67'); hd.addColorStop(1, '#2e6840');
+                c.fillStyle = hd; c.strokeStyle = '#245338'; c.lineWidth = 4;
+                c.beginPath(); c.ellipse(63, -13, 38, 34, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+
+                /* eyes follow pointer */
+                const px = window.mx || innerWidth * .5, py = window.my || innerHeight * .5;
+                const targetX = (px - innerWidth / 2) / innerWidth * 7, targetY = (py - innerHeight / 2) / innerHeight * 5;
+                const blinkNow = (blink % 7) > 6.7;
+                for (const ex of [51, 74]) {
+                    c.fillStyle = '#fff'; c.beginPath(); c.ellipse(ex, -25, 10, 13, 0, 0, Math.PI * 2); c.fill();
+                    if (!blinkNow) { c.fillStyle = '#15251c'; c.beginPath(); c.arc(ex + targetX * .35, -25 + targetY * .35, 5, 0, Math.PI * 2); c.fill() }
+                }
+                c.strokeStyle = '#23412e'; c.lineWidth = 3; c.beginPath(); c.arc(64, -7, 11, .15, 1.9); c.stroke();
+
+                /* cloth / wiping motion */
+                c.save(); c.translate(-78, 43 + Math.sin(t * 6) * 7); c.rotate(-.18 + Math.sin(t * 6) * .12);
+                const cl = c.createLinearGradient(0, 0, 38, 18); cl.addColorStop(0, '#fff'); cl.addColorStop(1, '#8195cf');
+                c.fillStyle = cl; c.beginPath(); c.roundRect(-3, -4, 42, 22, 6); c.fill(); c.restore();
+
+                c.restore();
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+        makeTurtle(document.getElementById('turtleCanvas'));
+        makeTurtle(document.getElementById('revealCanvas'), true);
+
+        /* Pointer-aware turtle dragging */
+        const tw = document.getElementById('turtleWrap'); let drag = false, ox = 0, oy = 0;
+        tw.addEventListener('pointerdown', e => {
+            drag = true; tw.classList.add('dragging'); tw.setPointerCapture(e.pointerId);
+            const r = tw.getBoundingClientRect(); ox = e.clientX - r.left; oy = e.clientY - r.top;
+        });
+        tw.addEventListener('pointermove', e => {
+            if (!drag) return;
+            tw.style.left = Math.max(0, Math.min(innerWidth - 240, e.clientX - ox)) + 'px';
+            tw.style.top = Math.max(80, Math.min(innerHeight - 190, e.clientY - oy)) + 'px';
+            tw.style.bottom = 'auto';
+        });
+        ['pointerup', 'pointercancel'].forEach(x => tw.addEventListener(x, () => { drag = false; tw.classList.remove('dragging') }));
+
+        window.addEventListener('pointermove', e => { window.mx = e.clientX; window.my = e.clientY });
+
+        /* Reveal */
+        const landing = document.getElementById('landing'), reveal = document.getElementById('reveal');
+
+        const sorryLine = document.getElementById('sorryLine');
+        const sorrySubline = document.getElementById('sorrySubline');
+
+        function realisticApology() {
+            if (!sorryLine || !sorrySubline) return;
+            sorryLine.textContent = "I'm sorry... 🥺";
+            sorrySubline.textContent = "I know I messed up.";
+            setTimeout(() => {
+                document.getElementById('sorrySpeech')?.classList.add('fade-line');
+                setTimeout(() => {
+                    document.getElementById('sorrySpeech')?.classList.remove('fade-line');
+                    sorryLine.textContent = "I really mean it.";
+                    sorrySubline.textContent = "I just wanted to make things right.";
+                }, 420);
+            }, 1250);
+        }
+
+        document.getElementById('secret').onclick = () => {
+            landing.classList.add('hidden'); reveal.classList.add('show');
+            setTimeout(realisticApology, 2850);
+            setTimeout(() => petals(), 3900);
+        };
+        document.getElementById('back').onclick = () => {
+            reveal.classList.remove('show'); landing.classList.remove('hidden');
+        };
+
+        function petals() {
+            const box = document.getElementById('petals');
+            for (let i = 0; i < 18; i++) {
+                const p = document.createElement('span'); p.className = 'petal'; p.textContent = i % 3 ? '✦' : '🌸';
+                p.style.left = (20 + Math.random() * 55) + '%'; p.style.top = (45 + Math.random() * 18) + '%';
+                p.style.setProperty('--x', (-100 + Math.random() * 260) + 'px');
+                p.style.setProperty('--y', (-80 - Math.random() * 150) + 'px');
+                p.style.animationDelay = (Math.random() * .8) + 's'; box.appendChild(p);
+                setTimeout(() => p.remove(), 3600);
+            }
+        }
+    </script>
+</body>
+
+</html>
