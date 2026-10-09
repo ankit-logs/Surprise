@@ -1211,7 +1211,7 @@
         }
         function resetReveal() {
             TM.forEach(clearTimeout); TM = []; stage.classList.remove('in'); card.classList.remove('on'); btns.classList.remove('on');
-            body.innerHTML = ''; $('#ct').textContent = HER ? 'I really am sorry, ' + HER + '. ♡' : 'I really am sorry. ♡'; $('#yes').style.display = ''; sp.classList.remove('on'); stage.scrollTop = 0;
+            body.innerHTML = ''; $('#ct').textContent = HER ? 'I am really sorry, ' + HER + '. ♡' : 'I really am sorry. ♡'; $('#yes').style.display = ''; sp.classList.remove('on'); stage.scrollTop = 0;
             gift.getAnimations().forEach(a => a.cancel()); gift.style.opacity = 0; Object.assign(R, { walk: 9, sad: true, flower: true, happy: false })
         }
         resetReveal();
