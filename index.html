@@ -1010,13 +1010,13 @@
                     <div class="rtitle">
                         <div class="kicker">a little secret</div>
                         <h2 id="h2">You found it 👀</h2>
-                        <p>He came all this way just to say sorry.</p>
+                        <p>I came all this way just to say sorry.</p>
                     </div>
                     <div class="card" id="card">
                         <figure class="polaroid" id="polaroid" hidden><img alt="" id="photo">
                             <figcaption id="cap"></figcaption>
                         </figure>
-                        <h3 id="ct">I really am sorry. ♡</h3>
+                        <h3 id="ct">I am really sorry. ♡</h3>
                         <div id="body"></div>
                         <div class="btns" id="btns">
                             <button class="btn main" id="yes">I forgive you 💗</button>
@@ -1211,7 +1211,7 @@
         }
         function resetReveal() {
             TM.forEach(clearTimeout); TM = []; stage.classList.remove('in'); card.classList.remove('on'); btns.classList.remove('on');
-            body.innerHTML = ''; $('#ct').textContent = HER ? 'I am really sorry, ' + HER + '. ♡' : 'I really am sorry. ♡'; $('#yes').style.display = ''; sp.classList.remove('on'); stage.scrollTop = 0;
+            body.innerHTML = ''; $('#ct').textContent = HER ? 'I am really sorry, ' + HER + '. ♡' : 'I am really sorry. ♡'; $('#yes').style.display = ''; sp.classList.remove('on'); stage.scrollTop = 0;
             gift.getAnimations().forEach(a => a.cancel()); gift.style.opacity = 0; Object.assign(R, { walk: 9, sad: true, flower: true, happy: false })
         }
         resetReveal();
